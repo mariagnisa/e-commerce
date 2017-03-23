@@ -1,0 +1,17 @@
+﻿@model e_commerce.Models.ProductsViewModel
+@{
+    ViewBag.Title = Model.Id;
+}
+<div class="container-fluid">
+    <h2 class="text-center">@Model.ProductName</h2>
+    <img style="width: 400px; height: auto;" class="img-fluid mx-auto" src="@Url.Content("~/Content/img/" + @Model.ImgPath)" alt="@Model.ProductName" />
+    <p class="text-center"> @Model.ProductDescription</p>
+    <p class="text-center">Price @Model.ProductPrice £ </p>
+
+@using (Html.BeginForm("AddItemToCart", "Cart"))
+{
+    <input type="hidden" name="ProductId" value="@Model.Id" />
+    <input type="text" name="Quantity" value="1" /> <br />
+    <input type="submit" value="Add to cart" />
+}
+</div>

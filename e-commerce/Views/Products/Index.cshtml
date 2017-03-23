@@ -1,0 +1,21 @@
+﻿@model List<e_commerce.Models.ProductsViewModel>
+@{
+    ViewBag.Title = "All products";
+}
+
+<div class="text-center">
+    <h1>All our pictures</h1>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        @foreach (var product in Model)
+        {
+            <div class="col-sm-3">
+                <img style="width: 200px; height: auto;" class="img-fluid" src="@Url.Content("~/Content/img/" + product.ImgPath)" alt="@product.ProductName" /> <br />
+                <p class="text-center">Photographer: @(product.ProductName)</p> <br />
+                <small class="text-center">Price @product.ProductPrice £</small> <br />
+                <a class="text-center" href="/products/details/@(product.Id)">View more info</a>
+            </div>
+        }
+    </div>
+</div>
