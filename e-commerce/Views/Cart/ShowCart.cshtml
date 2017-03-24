@@ -1,4 +1,4 @@
-﻿@model e_commerce.Models.ProductsViewModel
+﻿@model List<e_commerce.Models.CartViewModel>
 @{
     ViewBag.Title = "ShowCart";
 }
@@ -6,15 +6,20 @@
 <h2>Your cart</h2>
 <div class="container-fluid">
     <div class="row">
-
-        @foreach (var cart in Model)
-        {
-            <div class="col-sm-3">
+          @foreach (var cart in Model)
+          {
+            <div class="col-sm-4">
                 <h2>@cart.ProductName</h2> <br />
+                <img style="width: 200px; height: 200px;" class="img-fluid" src="@Url.Content("~/Content/img/" + cart.ImgPath)" alt="@cart.ProductName" /> <br />
                 <p>@cart.ProductDescription</p> <br />
-                <small>@cart.ProductPrice</small>
+                <small>Price @cart.ProductPrice</small> <br />
+                <p>Quantity</p>
+                <input type="number" name="cartQuantity" value="@cart.Quantity" /> <br />
+                <input type="submit" name="Delete" value="Delete product" />
+                <input type="submit" name="Add" value="Change quantity" />
             </div>
-        }
+          }
+
     </div>
 </div>
 
