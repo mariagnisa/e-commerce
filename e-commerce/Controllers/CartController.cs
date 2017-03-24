@@ -22,14 +22,21 @@ namespace e_commerce.Controllers
 
         //get cart
         [HttpGet]
-        public ActionResult ShowCart(string CartId)
+        public ActionResult ShowCart()
         {
-            CartViewModel Cart;
+            List<CartViewModel> Cart;
+            var CartId = Request.Cookies["shoppingCart"].Value;
+
+            if (CartId == null)
+            {
+
+            } 
+
             using (var connection = new SqlConnection(this.connectionString))
             {
-                var insert = "select * from Cart where CartId = @CartId";
+                var query = "select * from Cart as C join Products as P on P.Id = C.ProductId where CartId = @CartId";
                 var parameters = new { CartId = CartId };
-                Cart = connection.QuerySingleOrDefault<CartViewModel>(insert, parameters);
+                Cart = connection.Query<CartViewModel>(query, parameters).ToList();
             }
 
             return View(Cart);
