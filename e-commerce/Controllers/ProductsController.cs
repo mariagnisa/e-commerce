@@ -16,6 +16,7 @@ namespace e_commerce.Controllers
         // GET: Products
         public ActionResult Index()
         {
+            //Get all products and display them
             List<ProductsViewModel> products;
             using (var connection = new SqlConnection(this.connectionString))
             {
@@ -26,6 +27,7 @@ namespace e_commerce.Controllers
 
         public ActionResult Details (string id)
         {
+            //Display the choosen product details
             ProductsViewModel product;
             using (var connection = new SqlConnection(this.connectionString))
             {
@@ -34,6 +36,7 @@ namespace e_commerce.Controllers
                 product = connection.QuerySingleOrDefault<ProductsViewModel>(query, parameters);
             }
 
+            //If the product does not exists, show 404 page
             if (product == null)
             {
                 return HttpNotFound();
