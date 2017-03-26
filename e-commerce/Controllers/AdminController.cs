@@ -20,6 +20,7 @@ namespace e_commerce.Controllers
         [HttpGet]
         public ActionResult Index()
         {
+            //Check session if admin is logged in or not
             if (Session["admin"] != null)
             {
                 return RedirectToAction("AddProduct");
@@ -32,10 +33,12 @@ namespace e_commerce.Controllers
         {
             using (var connection = new SqlConnection(this.connectionString))
             {
+                //Validate username and password input against the db
                 var query = "select * from Admin where Username = @username and Password = @password";
                 var parameters = new { username = Username, password = Password };
                 var authAdmin = connection.QuerySingleOrDefault(query, parameters);
 
+                //If correct password and username redirect to AddProduct, otherwise throw alert box
                 if (authAdmin != null)
                 {
                     Session["admin"] = authAdmin;
@@ -50,6 +53,7 @@ namespace e_commerce.Controllers
         [HttpGet]
         public ActionResult AddProduct()
         {
+            //check if the admin user is logged in, otherwise redirect to login form
             if (Session["admin"] != null)
             {
                 return View();              
@@ -78,7 +82,6 @@ namespace e_commerce.Controllers
             }
             return RedirectToAction("AddProduct");
         }
-         
-    
+
     }
 }
