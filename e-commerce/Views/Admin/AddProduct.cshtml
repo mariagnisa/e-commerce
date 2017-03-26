@@ -5,18 +5,21 @@
 
 <h2>Add new product</h2>
 <div class="container-fluid">
-    @using (Html.BeginForm())
-    {
-        @Html.LabelFor(model => model.ProductName) 
+
+    
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+        @Html.LabelFor(model => model.ProductName, "Name") 
         @Html.EditorFor(model => model.ProductName)<br>
-        @Html.LabelFor(model => model.ProductDescription)
+        @Html.LabelFor(model => model.ProductDescription, "Description")
         @Html.EditorFor(model => model.ProductDescription)<br>
-        @Html.LabelFor(model => model.ProductPrice)
-        @Html.EditorFor(model => model.ProductPrice)<br>
-        @Html.LabelFor(model => model.ImgPath)
-        @Html.EditorFor(model => model.ImgPath)<br>
+        @Html.LabelFor(model => model.ProductPrice, "Price")
+        @Html.EditorFor(model => model.ProductPrice) <br />
+        <label for="file">Choose image</label> <br />
+        <input type="file" name="file" accept="image/png" />
 
         <input type="submit" value="Add product" />
-    }
+        }
+   
 </div>
 
