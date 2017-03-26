@@ -20,6 +20,10 @@ namespace e_commerce.Controllers
         [HttpGet]
         public ActionResult Index()
         {
+            if (Session["admin"] != null)
+            {
+                return RedirectToAction("AddProduct");
+            }
             return View();
         }
 
@@ -37,8 +41,7 @@ namespace e_commerce.Controllers
                     Session["admin"] = authAdmin;
 
                     return RedirectToAction("AddProduct");
-                }
-              
+                }   
             }
             System.Web.HttpContext.Current.Response.Write("<script>alert('Wrong username or password. Please try again.');</script>");
             return View();
@@ -47,16 +50,21 @@ namespace e_commerce.Controllers
         [HttpGet]
         public ActionResult AddProduct()
         {
-            return View();
+            if (Session["admin"] != null)
+            {
+                return View();              
+            }
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
         public ActionResult AddProduct(ProductsViewModel model, HttpPostedFileBase file)
         {
+            
             using (var connection = new SqlConnection(this.connectionString))
             {
                 //verify that a file is selected
-                if(file != null && file.ContentLength > 0)
+                if (file != null && file.ContentLength > 0)
                 {
                     //extract the filename and adds the current timestamp
                     var fileName = Environment.TickCount + "_" + file.FileName;
@@ -68,9 +76,9 @@ namespace e_commerce.Controllers
                     connection.Execute(insert, parameters);
                 }
             }
-                return RedirectToAction("AddProduct");
+            return RedirectToAction("AddProduct");
         }
-
-        
+         
+    
     }
 }

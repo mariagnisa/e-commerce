@@ -3,23 +3,25 @@
     ViewBag.Title = "AddProduct";
 }
 
-<h2>Add new product</h2>
+
 <div class="container-fluid">
+    <h2>Add new product</h2>
 
-    
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
-        {
-        @Html.LabelFor(model => model.ProductName, "Name") 
-        @Html.EditorFor(model => model.ProductName)<br>
-        @Html.LabelFor(model => model.ProductDescription, "Description")
-        @Html.EditorFor(model => model.ProductDescription)<br>
-        @Html.LabelFor(model => model.ProductPrice, "Price")
-        @Html.EditorFor(model => model.ProductPrice) <br />
-        <label for="file">Choose image</label> <br />
-        <input type="file" name="file" accept="image/png" />
+        
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.LabelFor(model => model.ProductName, "Name") 
+                @Html.EditorFor(model => model.ProductName)<br>
+                @Html.LabelFor(model => model.ProductDescription, "Description")
+                @Html.EditorFor(model => model.ProductDescription)<br>
+                @Html.LabelFor(model => model.ProductPrice, "Price")
+                @Html.EditorFor(model => model.ProductPrice) <br />
+                <label for="file">Choose image</label> <br />
+                <input type="file" name="file" accept="image/png" />
 
-        <input type="submit" value="Add product" />
-        }
-   
+                <input type="submit" value="Add product" />
+            }
+         
+
 </div>
 

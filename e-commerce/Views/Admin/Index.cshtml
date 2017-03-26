@@ -8,9 +8,9 @@
     @using (Html.BeginForm())
     {
         @Html.LabelFor(model => model.Username, "Your username")
-        @Html.EditorFor(model => model.Username)<br>
+        @Html.EditorFor(model => model.Username) <br>
         @Html.LabelFor(model => model.Password, "Your password")
-        @Html.EditorFor(model => model.Password)<br>
+        @Html.PasswordFor(model => model.Password) <br>
         <input type="submit" value="Login" />
     }
 
