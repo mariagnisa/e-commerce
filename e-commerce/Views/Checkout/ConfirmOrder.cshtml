@@ -1,0 +1,57 @@
+﻿@model List<e_commerce.Models.CheckoutViewModel>
+@{
+    ViewBag.Title = "ConfirmOrder";
+}
+<div class="container-fluid">
+    <h1>Thanks for your order!</h1>
+    <div style="border: 1px solid black; padding-left: 15px;">
+        <h3>Your order</h3>
+        <h6>Ordernumber @Model.First().OrderId</h6>
+        @if (Model.First().Orderstatus == (int)e_commerce.Util.Orderstatus.UnderProgress)
+        {
+            <em>Your order are under progress. </em>
+        }
+        else if (Model.First().Orderstatus == (int)e_commerce.Util.Orderstatus.Succes)
+        {
+            <p>Your order have been delivered.</p>
+        }
+        else
+        {
+            <p>Your order have been cancelled. </p>
+        }
+        <br />
+        <small>Order date @Model.First().OrderDate</small>
+        <div style="display: flex; flex-direction: row; flex-wrap: wrap;" class="row">
+
+            @foreach (var order in Model)
+            {
+                <div class="col-sm-4">
+                    <p>@order.ProductName</p>
+                </div>
+                <div class="col-sm-4">
+                    <p>Quantity: @order.Quantity </p>
+                </div>
+                <div class="col-sm-4">
+                    <strong>Price: @(order.Quantity * order.Price)</strong>
+                </div>
+            }
+        </div>
+        <div>
+            <h3>Total price @ViewBag.TotalSum £</h3>
+        </div>
+    </div>
+        <h2 style="margin-top: 40px;">Your details</h2>
+
+        <div class="col-sm-12">
+            <p>First name: @Model.First().Firstname</p> 
+            <p>Last name: @Model.First().Lastname</p> 
+            <p>Email: @Model.First().Email</p> 
+            <p>Phone: @Model.First().Phone</p> 
+            <p>Street: @Model.First().Street</p>
+            <p>Postal code: @Model.First().PostalCode</p> 
+            <p>City: @Model.First().City</p>
+        </div>
+
+
+    
+</div>

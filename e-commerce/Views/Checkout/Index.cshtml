@@ -1,0 +1,82 @@
+﻿@model List<e_commerce.Models.CheckoutViewModel>
+@{
+    ViewBag.Title = "Checkout";
+}
+
+<h1 class="text-center">Your order</h1>
+<div style="width: 80%;" class="container-fluid">
+
+    <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center;" class="row">
+        @foreach (var product in Model)
+        {
+            <div style="margin: 10px; padding: 10px; border: 1px solid black;" class="col">
+                <h4>@product.ProductName</h4> 
+                <p>@product.ProductDescription</p>
+  
+                <p>Quantity: @product.Quantity</p> 
+ 
+                <p>Price @(product.ProductPrice * product.Quantity) £</p>
+            </div>
+        }
+        </div>
+        <div class="row">
+            <div>
+                <h3 class="text-center">Total price @ViewBag.TotalSum £</h3>
+            </div>
+
+            <h2 style="padding-bottom: 40px; padding-top: 40px;" class="text-center">Your personal information</h2>
+
+            <div style="margin: auto; width: 50%;" class="row">
+                @using (Html.BeginForm("AddOrder", "Checkout"))
+            {
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="Firstname">Your first name: </label>
+                            <input class="form-control" type="text" name="Firstname" /> <br />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Lastname">Your last name: </label>
+                            <input class="form-control" type="text" name="Lastname" /> <br />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Email">Your email: </label>
+                            <input class="form-control" type="email" name="Email" /> <br />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Phone">Your phonenumber: </label>
+                            <input class="form-control" type="number" name="Phone" /> <br />
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="Street">Street: </label>
+                            <input class="form-control" type="text" name="Street" /> <br />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="PostalCode">Postal code: </label>
+                            <input class="form-control" type="number" name="PostalCode" /> <br />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="City">City :</label>
+                            <input class="form-control" type="text" name="City" /> <br />
+                        </div>
+
+                        <div class="form-group">
+                            <div class="checkout-box">
+                                <input style="background-color: green; color: white;" class="btn btn-default" type="submit" value="Order" />
+                            </div>
+                        </div>
+                    </div>
+                }
+        </div>
+
+    </div>
+
+</div>
+
