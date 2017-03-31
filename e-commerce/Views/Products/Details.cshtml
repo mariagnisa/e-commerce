@@ -2,16 +2,24 @@
 @{
     ViewBag.Title = Model.Id;
 }
-<div class="container-fluid">
-    <h2 class="text-center">@Model.ProductName</h2>
-    <img style="width: 400px; height: auto;" class="img-fluid mx-auto" src="@Url.Content("~/Content/img/" + @Model.ImgPath)" alt="@Model.ProductName" />
-    <p class="text-center"> @Model.ProductDescription</p>
-    <p class="text-center">Price @Model.ProductPrice £ </p>
+<div style="margin: 0 auto; width: 100%; display: flex; flex-direction: column; align-items: center;" class="container-fluid">
+    <div style="margin: 0 auto; padding-top: 40px; " class="row">
+        <img style="width: 500px; height: auto;" class="img-responsive img-thumbnail" src="@Url.Content("~/Content/img/" + @Model.ImgPath)" alt="@Model.ProductName" />
+        <div style="flex-direction: row; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <h4 >@Model.ProductName</h4>
+                <p > @Model.ProductDescription</p>
+                <p class="strong">Price @Model.ProductPrice £ </p>
+            </div>
+            @using (Html.BeginForm("AddItemToCart", "Cart"))
+            {
+                <div style="display: flex; flex-direction: row; padding-top: 10px;" class="form-group">
+                    <input type="hidden" name="ProductId" value="@Model.Id" />
+                    <input style="width: 40px; margin-right: 10px;" class="form-control" type="text" name="Quantity" value="1" /> <br />
 
-@using (Html.BeginForm("AddItemToCart", "Cart"))
-{
-    <input type="hidden" name="ProductId" value="@Model.Id" />
-    <input type="text" name="Quantity" value="1" /> <br />
-    <input type="submit" value="Add to cart" />
-}
-</div>
+                    <input style="background-color: green; color: white;" class="btn btn-default" type="submit" value="Add to cart" />
+                </div>
+            }
+        </div>
+    </div>
+    </div>
