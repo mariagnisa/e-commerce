@@ -1,0 +1,57 @@
+﻿@model List<e_commerce.Models.CartViewModel>
+@{
+    ViewBag.Title = "Cart";
+}
+
+<h1 class="text-center">Your cart</h1>
+<div style="margin: 0 auto; width: 100%;" class="container-fluid">
+    
+        @if (Model == null)
+        {
+            <h4 class="text-center">@ViewBag.Message</h4>
+        }
+        else
+        {
+            <div style="margin: 0 auto; padding-top: 40px; display: flex; flex-wrap: wrap; align-items: center;" class="row">
+                @foreach (var cart in Model)
+                {
+
+                <div style="margin:0 auto; width: 250px; padding-top: 25px;" class="col-xs-3">
+                    <img style="width: 200px; height: 200px;" class="img-responsive img-thumbnail" src="@Url.Content("~/Content/img/" + cart.ImgPath)" alt="@cart.ProductName" />
+                    <h4>@cart.ProductName</h4>
+                    <p>@cart.ProductDescription</p>
+                    <strong>Price @(cart.ProductPrice * cart.Quantity) £</strong>
+
+                    @using (Html.BeginForm("ChangeQuantityInCart", "Cart"))
+                    {
+                        <div style="display: flex; flex-direction: row; padding-top: 10px;" class="form-group">
+                            <input type="hidden" name="ProductId" value="@cart.ProductId" />
+                            <input type="hidden" name="CartId" value="@cart.CartId" />
+                            <input style="width: 50px; margin-right: 10px;" class="form-control" type="number" name="Quantity" value="@cart.Quantity" /> <br />
+                            <input class="btn btn-default" type="submit" name="Add" value="Change quantity" />
+                        </div>
+                    }
+                    @using (Html.BeginForm("DeleteFromCart", "Cart"))
+                    {
+
+                        <input type="hidden" name="ProductId" value="@cart.ProductId" />
+                        <input type="hidden" name="CartId" value="@cart.CartId" />
+                        <input style="background-color: red; color: white;" class="btn btn-default" type="submit" name="Delete" value="Delete product" />
+                    }
+
+                </div>
+                }
+            </div>
+        
+           
+                <div style="padding-top: 30px; float: right;" class="col">
+
+                    <h4>Total sum: @ViewBag.TotalSum £</h4>
+                    <button class="btn btn-default button" style="background-color: green; color: white; text-decoration: none;">@Html.ActionLink("Continue to order", "Index", "Checkout")</button>
+                </div>
+
+                }
+
+            
+</div>
+
