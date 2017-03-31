@@ -14,19 +14,14 @@ namespace e_commerce.Controllers
     {
         private readonly string connectionString = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
 
-        // GET: Cart
-        public ActionResult Index()
-        {
-            return View();
-        }
-
         //get cart
         [HttpGet]
-        public ActionResult ShowCart()
+        public ActionResult Index()
         {
             List<CartViewModel> Cart;
             var CartCookie = Request.Cookies["shoppingCart"];
             
+            //If cart is empty output message
             if (CartCookie == null)
             {
                 ViewBag.Message = "Your cart is currently empty.";
@@ -40,25 +35,33 @@ namespace e_commerce.Controllers
                 var query = "select * from Cart as C join Products as P on P.Id = C.ProductId where CartId = @CartId";
                 var parameters = new { CartId = CartId };
                 Cart = connection.Query<CartViewModel>(query, parameters).ToList();
+                ViewBag.TotalSum = Cart.Sum(p => p.ProductPrice * p.Quantity);
+            }
+
+            if (!Cart.Any())
+            {
+                ViewBag.Message = "Your cart is currently empty.";
+                return View();
             }
 
             return View(Cart);
         }
 
-        //insert and create cart
+        //add product to cart
         [HttpPost]
         public ActionResult AddItemToCart(int ProductId, int Quantity)
         {
             string CartId;
 
-            //See if there is any cookie, if not create one
+            //check if there is any cart, if not create one
             if (Request.Cookies["shoppingCart"] == null)
             {
                 //Give the cookie an unique id
                 CartId = Guid.NewGuid().ToString();
+                //save cart id in cookie
                 HttpCookie Cookie = new HttpCookie("shoppingCart");
                 Cookie.Value = CartId;
-                Cookie.Expires = DateTime.Now.AddDays(2d);
+                Cookie.Expires = DateTime.Now.AddDays(30d);
                 Response.Cookies.Add(Cookie);  
 
             } else
@@ -66,7 +69,7 @@ namespace e_commerce.Controllers
                 CartId = Request.Cookies["shoppingCart"].Value;
             }
 
-            //If product already exists in db, update quantity otherwise add product to cart
+            //If product already exists update the quantity otherwise add product to cart
             using (var connection = new SqlConnection(this.connectionString))
             {
                 var query = "select * from Cart where CartId = @CartId and ProductId = @ProductId";
@@ -91,27 +94,27 @@ namespace e_commerce.Controllers
         }
 
         [HttpPost]
-        public ActionResult ChangeQuantityInCart (int ProductId, int Quantity)
+        public ActionResult ChangeQuantityInCart (int ProductId, int Quantity, string CartId)
         {
             using (var connection = new SqlConnection(this.connectionString))
             {
-                var update = "update Cart set Quantity = @Quantity where ProductId = @ProductId";
-                var updateParameter = new { Quantity = Quantity, ProductId = ProductId };
+                var update = "update Cart set Quantity = @Quantity where CartId = @CartId and ProductId = @ProductId";
+                var updateParameter = new { Quantity = Quantity, CartId = CartId, ProductId = ProductId };
                 connection.Execute(update, updateParameter);
             }
-            return RedirectToAction("ShowCart");
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
-        public ActionResult DeleteCart(int ProductId)
+        public ActionResult DeleteFromCart(int ProductId, string CartId)
         {
             using (var connection = new SqlConnection(this.connectionString))
             {
-                var delete = "delete from Cart where ProductId = @ProductId";
-                var deleteParameter = new { ProductId = ProductId };
+                var delete = "delete from Cart where CartId = @CartId and ProductId = @ProductId";
+                var deleteParameter = new { CartId = CartId, ProductId = ProductId };
                 connection.Execute(delete, deleteParameter);
             }
-            return RedirectToAction("ShowCart");
+            return RedirectToAction("Index");
         }
     }
 }
