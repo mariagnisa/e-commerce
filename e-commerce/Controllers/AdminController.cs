@@ -83,5 +83,11 @@ namespace e_commerce.Controllers
             return RedirectToAction("AddProduct");
         }
 
+        public ActionResult Logout()
+        {
+            Session.Remove("admin");
+            return RedirectToAction("Index");
+        }
+
     }
 }
