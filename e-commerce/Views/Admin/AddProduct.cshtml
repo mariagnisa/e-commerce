@@ -10,18 +10,21 @@
         
             @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
-                @Html.LabelFor(model => model.ProductName, "Name") 
-                @Html.EditorFor(model => model.ProductName)<br>
-                @Html.LabelFor(model => model.ProductDescription, "Description")
-                @Html.EditorFor(model => model.ProductDescription)<br>
-                @Html.LabelFor(model => model.ProductPrice, "Price")
-                @Html.EditorFor(model => model.ProductPrice) <br />
-                <label for="file">Choose image</label> <br />
-                <input type="file" name="file" accept="image/png" />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ProductName, "Name: ")
+                    @Html.EditorFor(model => model.ProductName)<br>
+                    @Html.LabelFor(model => model.ProductDescription, "Description: ")
+                    @Html.EditorFor(model => model.ProductDescription)<br>
+                    @Html.LabelFor(model => model.ProductPrice, "Price: ")
+                    @Html.EditorFor(model => model.ProductPrice) <br />
+                    <label for="file">Choose image</label> <br />
+                    <input type="file" name="file" accept="image/png" />
+                    <p class="help-block">Choose a png file.</p>
 
-                <input type="submit" value="Add product" />
+                    <input class="btn btn-default" style="margin-top: 15px; background-color: green; color: white;" type="submit" value="Add product" />
+                </div>
             }
-         
+    <button class="btn btn-default " >@Html.ActionLink("Logout", "Logout", "Admin")</button>
 
 </div>
 
