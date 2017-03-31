@@ -4,17 +4,17 @@
 }
 
 <div class="text-center">
-    <h1>All our pictures</h1>
+    <h1>All our photographs</h1>
 </div>
-<div class="container-fluid">
-    <div class="row">
+<div style="margin: 0 auto; width: 100%;" class="container-fluid">
+    <div style="margin: 0 auto; padding-top: 15px; display: flex; flex-wrap: wrap;" class="row">
         @foreach (var product in Model)
         {
-            <div class="col-sm-3">
-                <img style="width: 200px; height: auto;" class="img-fluid" src="@Url.Content("~/Content/img/" + product.ImgPath)" alt="@product.ProductName" /> <br />
-                <p class="text-center">Photographer: @(product.ProductName)</p> <br />
-                <small class="text-center">Price @product.ProductPrice £</small> <br />
-                <a class="text-center" href="/products/details/@(product.Id)">View more info</a>
+            <div style="margin:0 auto; width: 250px; padding-top: 25px;" class="col-xs-3">
+                <img style="width: 200px; height: auto;" class="img-responsive img-thumbnail" src="@Url.Content("~/Content/img/" + product.ImgPath)" alt="@product.ProductName" /> <br />
+                <p>Photographer: <em> @(product.ProductName) </em></p> 
+                <strong>Price @product.ProductPrice £</strong> <br />
+                <a style="margin-top: 10px;" class="btn btn-default" href="/products/details/@(product.Id)">View more info</a>
             </div>
         }
     </div>
