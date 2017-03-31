@@ -7,11 +7,11 @@
     <h2>Login</h2>
     @using (Html.BeginForm())
     {
-        @Html.LabelFor(model => model.Username, "Your username")
+        @Html.LabelFor(model => model.Username, "Your username: ")
         @Html.EditorFor(model => model.Username) <br>
-        @Html.LabelFor(model => model.Password, "Your password")
+        @Html.LabelFor(model => model.Password, "Your password: ")
         @Html.PasswordFor(model => model.Password) <br>
-        <input type="submit" value="Login" />
+        <input class="btn btn-default" type="submit" value="Login" />
     }
 
 </div>
