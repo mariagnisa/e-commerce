@@ -31,12 +31,20 @@ namespace e_commerce.Controllers
         [HttpPost]
         public ActionResult Index(string Username, string Password)
         {
+            object authAdmin = null;
+
             using (var connection = new SqlConnection(this.connectionString))
             {
-                //Validate username and password input against the db
-                var query = "select * from Admin where Username = @username and Password = @password";
-                var parameters = new { username = Username, password = Password };
-                var authAdmin = connection.QuerySingleOrDefault(query, parameters);
+                try
+                {
+                    //Validate username and password input against the db
+                    var query = "select * from Admin where Username = @username and Password = @password";
+                    var parameters = new { username = Username, password = Password };
+                    authAdmin = connection.QuerySingleOrDefault(query, parameters);
+                } catch (SqlException)
+                {
+                    return View("Error");
+                }
 
                 //If correct password and username redirect to AddProduct, otherwise throw alert box
                 if (authAdmin != null)
@@ -46,7 +54,7 @@ namespace e_commerce.Controllers
                     return RedirectToAction("AddProduct");
                 }   
             }
-            System.Web.HttpContext.Current.Response.Write("<script>alert('Wrong username or password. Please try again.');</script>");
+            ViewBag.message = "Wrong username or password. Please try again.";
             return View();
         }
 
@@ -75,12 +83,21 @@ namespace e_commerce.Controllers
                     //Save the file to given path
                     file.SaveAs(Server.MapPath("~\\Content\\img\\") + fileName);
 
-                    var insert = "insert into Products (ProductName, ProductDescription, ProductPrice, ImgPath) values (@Name, @Description, @Price, @Path)";
-                    var parameters = new { Name = model.ProductName, Description = model.ProductDescription, Price = model.ProductPrice, Path = fileName };
-                    connection.Execute(insert, parameters);
+                    try
+                    {
+                        var insert = "insert into Products (ProductName, ProductDescription, ProductPrice, ImgPath) values (@Name, @Description, @Price, @Path)";
+                        var parameters = new { Name = model.ProductName, Description = model.ProductDescription, Price = model.ProductPrice, Path = fileName };
+                        connection.Execute(insert, parameters);
+                    } catch (SqlException)
+                    {
+                        return View("Error");
+                    }
                 }
             }
-            return RedirectToAction("AddProduct");
+            ViewBag.message = "The product has been added.";
+            //clear the input fields
+            ModelState.Clear();
+            return View();
         }
 
         public ActionResult Logout()
