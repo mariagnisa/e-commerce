@@ -3,11 +3,15 @@
     ViewBag.Title = "AddProduct";
 }
 
-
 <div class="container-fluid">
+    @if (ViewBag.message != null)
+    {
+        <div>
+            <p class="alert alert-success">@ViewBag.message</p>
+        </div>
+    }
     <h2>Add new product</h2>
-
-        
+ 
             @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 <div class="form-group">
