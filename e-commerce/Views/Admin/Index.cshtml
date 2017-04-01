@@ -5,6 +5,14 @@
 
 <div class="container-fluid">
     <h2>Login</h2>
+    @if (ViewBag.message != null)
+    {
+        <div>
+            <p class="alert alert-danger">@ViewBag.message</p>
+        </div>
+    }
+    
+   
     @using (Html.BeginForm())
     {
         @Html.LabelFor(model => model.Username, "Your username: ")
