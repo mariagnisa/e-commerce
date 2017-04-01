@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = "ConfirmOrder";
 }
+ 
 <div class="container-fluid">
     <h1>Thanks for your order!</h1>
     <div style="border: 1px solid black; padding-left: 15px;">
@@ -9,7 +10,8 @@
         <h6>Ordernumber @Model.First().OrderId</h6>
         @if (Model.First().Orderstatus == (int)e_commerce.Util.Orderstatus.UnderProgress)
         {
-            <em>Your order are under progress. </em>
+            <em style="color: green;">Your order are under progress. </em>
+            <br />
         }
         else if (Model.First().Orderstatus == (int)e_commerce.Util.Orderstatus.Succes)
         {
@@ -20,38 +22,54 @@
             <p>Your order have been cancelled. </p>
         }
         <br />
-        <small>Order date @Model.First().OrderDate</small>
-        <div style="display: flex; flex-direction: row; flex-wrap: wrap;" class="row">
-
-            @foreach (var order in Model)
-            {
-                <div class="col-sm-4">
-                    <p>@order.ProductName</p>
-                </div>
-                <div class="col-sm-4">
-                    <p>Quantity: @order.Quantity </p>
-                </div>
-                <div class="col-sm-4">
-                    <strong>Price: @(order.Quantity * order.Price)</strong>
-                </div>
-            }
-        </div>
+        <small>Order date @Model.First().OrderDate.ToShortDateString()</small>
+        <br />
+        
+            <table style="margin-top: 15px;" class="table table-striped">
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>
+                            <p>@order.ProductName</p>
+                        </td>
+                        <td>
+                            <p>Quantity: @order.Quantity </p>
+                        </td>
+                        <td>
+                            <strong>Price: @(order.Quantity * order.Price) £</strong>
+                        </td>
+                    </tr>
+                }
+            </table>
+        
         <div>
-            <h3>Total price @ViewBag.TotalSum £</h3>
+            <h3>Total price: @Model.Sum(p => p.ProductPrice * p.Quantity) £</h3>
         </div>
     </div>
         <h2 style="margin-top: 40px;">Your details</h2>
 
-        <div class="col-sm-12">
-            <p>First name: @Model.First().Firstname</p> 
-            <p>Last name: @Model.First().Lastname</p> 
-            <p>Email: @Model.First().Email</p> 
-            <p>Phone: @Model.First().Phone</p> 
-            <p>Street: @Model.First().Street</p>
-            <p>Postal code: @Model.First().PostalCode</p> 
-            <p>City: @Model.First().City</p>
-        </div>
-
-
-    
+        <table class="table table-bordered">
+            <tr>
+                <td>First name: @Model.First().Firstname</td>
+            </tr>
+            <tr>
+                <td>Last name: @Model.First().Lastname</td>
+            </tr>
+            <tr>
+                <td>Email: @Model.First().Email</td>
+            </tr>
+            <tr>
+                <td>Phone: @Model.First().Phone</td>
+            </tr> 
+            <tr>
+                <td>Street: @Model.First().Street</td>
+            </tr>  
+            <tr>
+                <td>Postal code: @Model.First().PostalCode</td>
+            </tr>  
+            <tr>
+                <td>City: @Model.First().City</td>
+            </tr>  
+                
+        </table> 
 </div>
