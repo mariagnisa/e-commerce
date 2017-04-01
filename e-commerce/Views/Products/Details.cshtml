@@ -2,7 +2,11 @@
 @{
     ViewBag.Title = Model.Id;
 }
+@section scripts{ <script type="text/javascript" src="~/scripts/cameraObscura.js"></script> }
 <div style="margin: 0 auto; width: 100%; display: flex; flex-direction: column; align-items: center;" class="container-fluid">
+    <div class="text-center">
+        <p style="padding: 10px;" class="messageBox"></p>
+    </div>
     <div style="margin: 0 auto; padding-top: 40px; " class="row">
         <img style="width: 500px; height: auto;" class="img-responsive img-thumbnail" src="@Url.Content("~/Content/img/" + @Model.ImgPath)" alt="@Model.ProductName" />
         <div style="flex-direction: row; display: flex; justify-content: space-between; align-items: flex-end;">
@@ -17,9 +21,10 @@
                     <input type="hidden" name="ProductId" value="@Model.Id" />
                     <input style="width: 40px; margin-right: 10px;" class="form-control" type="text" name="Quantity" value="1" /> <br />
 
-                    <input style="background-color: green; color: white;" class="btn btn-default" type="submit" value="Add to cart" />
+                    <input style="background-color: green; color: white;" class="addProduct btn btn-default" type="submit" value="Add to cart" />
                 </div>
             }
+            <button style="margin-bottom: -40px;" class="btn btn-default">@Html.ActionLink("Back to products", "Index", "Products")</button>
         </div>
     </div>
     </div>
