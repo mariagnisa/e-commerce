@@ -32,3 +32,10 @@ textarea {
     text-decoration: none;
     color: white !important;
 }
+
+.messageBox {
+    display: none;
+    width: 200px;
+    height: 50px;
+}
+
