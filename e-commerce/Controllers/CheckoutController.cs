@@ -23,10 +23,16 @@ namespace e_commerce.Controllers
 
             using (var connection = new SqlConnection(this.connectionString))
             {
-                var query = "select * from Cart as C join Products as P on P.Id = C.ProductId where CartId = @CartId";
-                var parameters = new { CartId = CartId };
-                CartProducts = connection.Query<CheckoutViewModel>(query, parameters).ToList();
-                ViewBag.TotalSum = CartProducts.Sum(p => p.ProductPrice * p.Quantity);
+                try
+                {
+                    var query = "select * from Cart as C join Products as P on P.Id = C.ProductId where CartId = @CartId";
+                    var parameters = new { CartId = CartId };
+                    CartProducts = connection.Query<CheckoutViewModel>(query, parameters).ToList();
+                    
+                } catch (SqlException)
+                {
+                    return View("Error");
+                }
             }
             return View(CartProducts);
         }
@@ -36,6 +42,7 @@ namespace e_commerce.Controllers
         {
             string CartId = Request.Cookies["shoppingCart"].Value;
             int OrderId;
+            int CustomerId = 0;
             List<CheckoutViewModel> Products;
 
             using (var connection = new SqlConnection(this.connectionString))
@@ -46,19 +53,37 @@ namespace e_commerce.Controllers
                     var insert = "insert into Customer (Firstname, Lastname, Email, Phone, Street, PostalCode, City) values (@Firstname, @Lastname, @Email, @Phone, @Street, @PostalCode, @City)";
                     var parameters = new { Firstname = Firstname, Lastname = Lastname, Email = Email, Phone = Phone, Street = Street, PostalCode = PostalCode, City = City };
                     connection.Execute(insert, parameters);
-                    var CustomerId = connection.Query<int>("SELECT MAX(Id) from Customer").First();
+                    CustomerId = connection.Query<int>("SELECT MAX(Id) from Customer").First();
+                } catch (SqlException)
+                {
+                    return View("Error");
+                }
 
+                try
+                {
                     // add order to db and get last inserted order id
                     var insertOrder = "insert into Orders (Orderstatus, CustomerId, CartId) values (@Orderstatus, @CustomerId, @CartId)";
                     var OrderParameters = new { Orderstatus = 1, CustomerId = CustomerId, CartId = CartId };
                     connection.Execute(insertOrder, OrderParameters);
                     OrderId = connection.Query<int>("SELECT MAX(OrderId) from Orders").First();
+                } catch (SqlException)
+                {
+                    return View("Error");
+                }
 
+                try
+                {
                     //get products
                     var selectProducts = "select C.ProductId, C.Quantity, P.ProductPrice from Cart as C join Products as P on C.ProductId = P.Id where C.CartId = @CartId";
                     var productsParameters = new { CartId = CartId };
                     Products = connection.Query<CheckoutViewModel>(selectProducts, productsParameters).ToList();
+                } catch (SqlException)
+                {
+                    return View("Error");
+                }
 
+                try
+                {
                     //add products to order item in db
                     foreach (CheckoutViewModel CartProduct in Products)
                     {
@@ -66,14 +91,19 @@ namespace e_commerce.Controllers
                         var OrderParam = new { OrderId = OrderId, ProductId = CartProduct.ProductId, Quantity = CartProduct.Quantity, Price = CartProduct.ProductPrice };
                         connection.Execute(OrderProducts, OrderParam);
                     }
+                } catch (SqlException)
+                {
+                    return View("Error");
+                }
 
+                try { 
                     //delete cart from db
                     var deleteCart = "delete from Cart where CartId = @CartId";
                     var DeleteParam = new { CartId = CartId };
                     connection.Execute(deleteCart, DeleteParam);
-                } catch (Exception e)
+                } catch (SqlException)
                 {
-                    throw new Exception("Something went wrong.", e);
+                    return View("Error");
                 }
                 
             }
@@ -94,10 +124,16 @@ namespace e_commerce.Controllers
 
             using (var connection = new SqlConnection(this.connectionString))
             {
-                var query = "select * from Orders as O join Customer as Cu on Cu.Id = O.CustomerId join OrderProducts as Op on O.OrderId = Op.OrderId join Products as P on Op.ProductId = P.Id where O.OrderId = @OrderId";
-                var parameters = new { OrderId = OrderId };
-                Order = connection.Query<CheckoutViewModel>(query, parameters).ToList();
-                ViewBag.TotalSum = Order.Sum(p => p.ProductPrice * p.Quantity);
+                try
+                {
+                    var query = "select * from Orders as O join Customer as Cu on Cu.Id = O.CustomerId join OrderProducts as Op on O.OrderId = Op.OrderId join Products as P on Op.ProductId = P.Id where O.OrderId = @OrderId";
+                    var parameters = new { OrderId = OrderId };
+                    Order = connection.Query<CheckoutViewModel>(query, parameters).ToList();
+                    ViewBag.TotalSum = Order.Sum(p => p.ProductPrice * p.Quantity);
+                } catch (SqlException)
+                {
+                    return View("Error");
+                }
             }
     
             return View(Order);
