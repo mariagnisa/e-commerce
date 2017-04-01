@@ -20,7 +20,7 @@ namespace e_commerce.Controllers
         {
             List<CartViewModel> Cart;
             var CartCookie = Request.Cookies["shoppingCart"];
-            
+
             //If cart is empty output message
             if (CartCookie == null)
             {
@@ -32,12 +32,18 @@ namespace e_commerce.Controllers
 
             using (var connection = new SqlConnection(this.connectionString))
             {
-                var query = "select * from Cart as C join Products as P on P.Id = C.ProductId where CartId = @CartId";
-                var parameters = new { CartId = CartId };
-                Cart = connection.Query<CartViewModel>(query, parameters).ToList();
-                ViewBag.TotalSum = Cart.Sum(p => p.ProductPrice * p.Quantity);
+                try { 
+                    var query = "select * from Cart as C join Products as P on P.Id = C.ProductId where CartId = @CartId";
+                    var parameters = new { CartId = CartId };
+                    Cart = connection.Query<CartViewModel>(query, parameters).ToList();
+
+                } catch (SqlException)
+                {
+                    return View("Error");
+                }
             }
 
+            //if a cookie exits but is empty, output message
             if (!Cart.Any())
             {
                 ViewBag.Message = "Your cart is currently empty.";
@@ -52,6 +58,8 @@ namespace e_commerce.Controllers
         public ActionResult AddItemToCart(int ProductId, int Quantity)
         {
             string CartId;
+            CartViewModel queryStatement;
+            var jsonResponse = new UpdateCartResponseModel();
 
             //check if there is any cart, if not create one
             if (Request.Cookies["shoppingCart"] == null)
@@ -72,49 +80,90 @@ namespace e_commerce.Controllers
             //If product already exists update the quantity otherwise add product to cart
             using (var connection = new SqlConnection(this.connectionString))
             {
-                var query = "select * from Cart where CartId = @CartId and ProductId = @ProductId";
-                var queryParameter = new { CartId = CartId, ProductId = ProductId };
-                var queryStatement = connection.QuerySingleOrDefault<CartViewModel>(query, queryParameter);
+                try { 
+                    var query = "select * from Cart where CartId = @CartId and ProductId = @ProductId";
+                    var queryParameter = new { CartId = CartId, ProductId = ProductId };
+                    queryStatement = connection.QuerySingleOrDefault<CartViewModel>(query, queryParameter);
+                } catch (SqlException)
+                {
+                    return View("Error");
+                }
 
                 if (queryStatement != null)
                 {
-                    var update = "update Cart set Quantity = Quantity + @Quantity where ProductId = @ProductId";
-                    var updateParameter = new { Quantity = Quantity, ProductId = ProductId };
-                    connection.Execute(update, updateParameter);
+                    try { 
+                        var update = "update Cart set Quantity = Quantity + @Quantity where ProductId = @ProductId";
+                        var updateParameter = new { Quantity = Quantity, ProductId = ProductId };
+                        connection.Execute(update, updateParameter);
+                    } catch (SqlException)
+                    {
+                        return View("Error");
+                    }
                 } else
                 {
-                    var insert = "insert into Cart (CartId, ProductId, Quantity) values (@CartId, @ProductId, @Quantity)";
-                    var parameters = new { CartId = CartId, ProductId = ProductId, Quantity = Quantity };
-                    connection.Execute(insert, parameters);
+                    try { 
+                        var insert = "insert into Cart (CartId, ProductId, Quantity) values (@CartId, @ProductId, @Quantity)";
+                        var parameters = new { CartId = CartId, ProductId = ProductId, Quantity = Quantity };
+                        connection.Execute(insert, parameters);
+                    } catch (SqlException)
+                    {
+                        return View("Error");
+                    }
                 }
 
+                jsonResponse.succes = true;
+                jsonResponse.message = "The product has been added to your cart.";
             }
 
-            return RedirectToAction("Index", "Products");
+            return Json(jsonResponse, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
         public ActionResult ChangeQuantityInCart (int ProductId, int Quantity, string CartId)
         {
+            var jsonResponse = new UpdateCartResponseModel();
+
             using (var connection = new SqlConnection(this.connectionString))
             {
-                var update = "update Cart set Quantity = @Quantity where CartId = @CartId and ProductId = @ProductId";
-                var updateParameter = new { Quantity = Quantity, CartId = CartId, ProductId = ProductId };
-                connection.Execute(update, updateParameter);
+                try
+                {
+                    var update = "update Cart set Quantity = @Quantity where CartId = @CartId and ProductId = @ProductId";
+                    var updateParameter = new { Quantity = Quantity, CartId = CartId, ProductId = ProductId };
+                    connection.Execute(update, updateParameter);
+                } catch (SqlException )
+                {
+                    return View("Error");
+                }
             }
-            return RedirectToAction("Index");
+            jsonResponse.succes = true;
+            jsonResponse.message = "The quantity of the product is changed.";
+
+            return Json(jsonResponse, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
         public ActionResult DeleteFromCart(int ProductId, string CartId)
         {
+            var jsonResponse = new UpdateCartResponseModel();
+
             using (var connection = new SqlConnection(this.connectionString))
             {
-                var delete = "delete from Cart where CartId = @CartId and ProductId = @ProductId";
-                var deleteParameter = new { CartId = CartId, ProductId = ProductId };
-                connection.Execute(delete, deleteParameter);
+                try
+                {
+                    var delete = "delete from Cart where CartId = @CartId and ProductId = @ProductId";
+                    var deleteParameter = new { CartId = CartId, ProductId = ProductId };
+                    connection.Execute(delete, deleteParameter);
+                } catch (SqlException)
+                {
+                    
+                    return View("Error");
+                }
             }
-            return RedirectToAction("Index");
+
+            jsonResponse.succes = true;
+            jsonResponse.message = "The product is deleted.";
+
+            return Json(jsonResponse, JsonRequestBehavior.AllowGet);
         }
     }
 }
