@@ -20,7 +20,13 @@ namespace e_commerce.Controllers
             List<ProductsViewModel> products;
             using (var connection = new SqlConnection(this.connectionString))
             {
-                products = connection.Query<ProductsViewModel>("select * from Products").ToList();
+                try
+                {
+                    products = connection.Query<ProductsViewModel>("select * from Products").ToList();
+                } catch (SqlException)
+                {
+                    return View("Error");
+                }
             }
             return View(products);
         }
@@ -31,9 +37,15 @@ namespace e_commerce.Controllers
             ProductsViewModel product;
             using (var connection = new SqlConnection(this.connectionString))
             {
-                var query = "select * from Products where id = @productId";
-                var parameters = new { productId = id };
-                product = connection.QuerySingleOrDefault<ProductsViewModel>(query, parameters);
+                try
+                {
+                    var query = "select * from Products where id = @productId";
+                    var parameters = new { productId = id };
+                    product = connection.QuerySingleOrDefault<ProductsViewModel>(query, parameters);
+                } catch (SqlException)
+                {
+                    return View("Error");
+                }
             }
 
             //If the product does not exists, show 404 page
