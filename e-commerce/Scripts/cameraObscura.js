@@ -69,6 +69,26 @@ addButtons.forEach(function (button) {
     })
 })
 
+function AddOrder() {
+    let OrderForm = document.querySelector('.order-form');
+    if (OrderForm != null) {
+        OrderForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            var Phone = OrderForm.querySelector('input[name=Phone]').value;
+            if (Phone.match(/\d/g) && Phone.length == 10) {
+                this.submit();
+            } else {
+                window.scrollTo(500, 0);
+
+                showError("Invalid phonenumber.");
+            }
+        })
+    }
+
+}
+
+AddOrder();
+
 function updateCart() {
     let cartContainer = document.querySelector(".cart-container");
     fetch('/cart/Index', { credentials: "same-origin" })
