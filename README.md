@@ -1,7 +1,6 @@
 # E-commerce Camera Obscura
 A C# school assignment.
 
-<img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="cat" width="100%">
 # How to start
 -Clone this repo `git clone https://github.com/mariagnisa/e-commerce.git` using e.g. command prompt.
 
