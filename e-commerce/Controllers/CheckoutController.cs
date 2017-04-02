@@ -42,77 +42,92 @@ namespace e_commerce.Controllers
         {
             string CartId = Request.Cookies["shoppingCart"].Value;
             int OrderId;
-            int CustomerId = 0;
-            List<CheckoutViewModel> Products;
+            
+            
 
             using (var connection = new SqlConnection(this.connectionString))
             {
-                try
-                {
-                    // add customer to db and get last inserted customer id
-                    var insert = "insert into Customer (Firstname, Lastname, Email, Phone, Street, PostalCode, City) values (@Firstname, @Lastname, @Email, @Phone, @Street, @PostalCode, @City)";
-                    var parameters = new { Firstname = Firstname, Lastname = Lastname, Email = Email, Phone = Phone, Street = Street, PostalCode = PostalCode, City = City };
-                    connection.Execute(insert, parameters);
-                    CustomerId = connection.Query<int>("SELECT MAX(Id) from Customer").First();
-                } catch (SqlException)
-                {
-                    return View("Error");
-                }
+                //start sql transaction 
+                connection.Open();
+                SqlCommand command = connection.CreateCommand();
+                SqlTransaction transaction;
 
+                transaction = connection.BeginTransaction("orderTransaction");
+                // assign the command to local transaction
+                command.Connection = connection;
+                command.Transaction = transaction;
                 try
                 {
-                    // add order to db and get last inserted order id
-                    var insertOrder = "insert into Orders (Orderstatus, CustomerId, CartId) values (@Orderstatus, @CustomerId, @CartId)";
-                    var OrderParameters = new { Orderstatus = 1, CustomerId = CustomerId, CartId = CartId };
-                    connection.Execute(insertOrder, OrderParameters);
-                    OrderId = connection.Query<int>("SELECT MAX(OrderId) from Orders").First();
-                } catch (SqlException)
-                {
-                    return View("Error");
-                }
+                    // add customer to db 
+                    command.CommandText = "insert into Customer (Firstname, Lastname, Email, Phone, Street, PostalCode, City) values (@Firstname, @Lastname, @Email, @Phone, @Street, @PostalCode, @City)";     
+                    command.Parameters.AddWithValue("@Firstname", Firstname);
+                    command.Parameters.AddWithValue("@Lastname", Lastname);
+                    command.Parameters.AddWithValue("@Email", Email);
+                    command.Parameters.AddWithValue("@Phone", Phone);
+                    command.Parameters.AddWithValue("@Street", Street);
+                    command.Parameters.AddWithValue("@PostalCode", PostalCode);
+                    command.Parameters.AddWithValue("@City", City);
+                    command.ExecuteNonQuery();
+                 
 
-                try
-                {
+                    // add order to db 
+                    command.CommandText = "insert into Orders (Orderstatus, CustomerId, CartId) values (@Orderstatus, (SELECT MAX(Id) from Customer), @AddCartId)";
+                    command.Parameters.AddWithValue("@Orderstatus", 1);
+                    command.Parameters.AddWithValue("AddCartId", CartId);
+                    command.ExecuteNonQuery();
+                    
+                    
                     //get products
-                    var selectProducts = "select C.ProductId, C.Quantity, P.ProductPrice from Cart as C join Products as P on C.ProductId = P.Id where C.CartId = @CartId";
-                    var productsParameters = new { CartId = CartId };
-                    Products = connection.Query<CheckoutViewModel>(selectProducts, productsParameters).ToList();
-                } catch (SqlException)
-                {
-                    return View("Error");
-                }
-
-                try
-                {
-                    //add products to order item in db
-                    foreach (CheckoutViewModel CartProduct in Products)
+                    command.CommandText = "select C.ProductId, C.Quantity, P.ProductPrice from Cart as C join Products as P on C.ProductId = P.Id where C.CartId = @CartId";
+                    command.Parameters.AddWithValue("@CartId", CartId);
+                    var products = new List<CheckoutViewModel>();
+                    SqlDataReader ProductsReader = command.ExecuteReader();
+                    //reader loops through all the cart items 
+                    while (ProductsReader.Read())
                     {
-                        var OrderProducts = "insert into OrderProducts (OrderId, ProductId, Quantity, Price) values (@OrderId, @ProductId, @Quantity, @Price)";
-                        var OrderParam = new { OrderId = OrderId, ProductId = CartProduct.ProductId, Quantity = CartProduct.Quantity, Price = CartProduct.ProductPrice };
-                        connection.Execute(OrderProducts, OrderParam);
+                        var product = new CheckoutViewModel();
+                        product.ProductId = Int32.Parse(ProductsReader["ProductId"].ToString());
+                        product.Quantity = Int32.Parse(ProductsReader["Quantity"].ToString());
+                        product.ProductPrice = Int32.Parse(ProductsReader["ProductPrice"].ToString());
+                        products.Add(product);
                     }
-                } catch (SqlException)
-                {
-                    return View("Error");
-                }
+                    //close reader
+                    ProductsReader.Close();
 
-                try { 
+                //add products to order item in db
+                var count = 0;
+                    foreach (CheckoutViewModel CartProduct in products)
+                    {
+                        command.CommandText = "insert into OrderProducts (OrderId, ProductId, Quantity, Price) values ((SELECT MAX(OrderId) from Orders), @ProductId" + count + ", @Quantity" + count + ", @Price" + count + ")";
+                        command.Parameters.AddWithValue("@ProductId" + count + "", CartProduct.ProductId);
+                        command.Parameters.AddWithValue("@Quantity" + count + "", CartProduct.Quantity);
+                        command.Parameters.AddWithValue("@Price" + count + "", CartProduct.ProductPrice);
+                        command.ExecuteNonQuery();
+                        count++;
+                    }
+        
                     //delete cart from db
-                    var deleteCart = "delete from Cart where CartId = @CartId";
-                    var DeleteParam = new { CartId = CartId };
-                    connection.Execute(deleteCart, DeleteParam);
-                } catch (SqlException)
+                    command.CommandText = "delete from Cart where CartId = @deleteCartId";
+                    command.Parameters.AddWithValue("@deleteCartId", CartId);
+                    command.ExecuteNonQuery();
+
+                    //get last inserted id from orders
+                    command.CommandText = "select MAX(OrderId) from Orders";
+                    OrderId = Convert.ToInt32(command.ExecuteScalar());
+
+                    // delete cart cookie
+                    var CartCookie = new HttpCookie("shoppingCart");
+                    CartCookie.Expires = DateTime.Now.AddDays(-1);
+                    Response.Cookies.Add(CartCookie);
+
+                    transaction.Commit();
+
+                } catch (Exception)
                 {
+                    transaction.Rollback();
                     return View("Error");
-                }
-                
+                }              
             }
-
-
-            // delete cart cookie
-            var CartCookie = new HttpCookie("shoppingCart");
-            CartCookie.Expires = DateTime.Now.AddDays(-1);
-            Response.Cookies.Add(CartCookie);
 
             return RedirectToAction("ConfirmOrder", new { OrderId = OrderId });
         }
