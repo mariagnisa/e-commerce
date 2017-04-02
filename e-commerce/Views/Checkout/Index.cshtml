@@ -2,10 +2,12 @@
 @{
     ViewBag.Title = "Checkout";
 }
-
+@section scripts{ <script type="text/javascript" src="~/scripts/cameraObscura.js"></script> }
 <h1 class="text-center">Your order</h1>
 <div style="width: 80%;" class="container-fluid">
-
+    <div class="text-center">
+        <p style="padding: 10px;" class="messageBox"></p>
+    </div>
     <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center;" class="row">
         @foreach (var product in Model)
         {
@@ -27,8 +29,8 @@
             <h2 style="padding-bottom: 40px; padding-top: 40px;" class="text-center">Your personal information</h2>
 
             <div style="margin: auto; width: 50%;" class="row">
-                @using (Html.BeginForm("AddOrder", "Checkout"))
-            {
+                @using (Html.BeginForm("AddOrder", "Checkout", new { ReturnUrl = ViewBag.ReturnUrl}, FormMethod.Post, new { @class = "order-form" }))
+                {
                     <div class="col">
                         <div class="form-group">
                             <label for="Firstname">Your first name: </label>
@@ -47,8 +49,8 @@
 
                         <div class="form-group">
                             <label for="Phone">Your phonenumber: </label>
-                            <input class="form-control" type="number" min="9" name="Phone" required /> <br />
-                            <p class="help-block">(only numbers without characters)</p>
+                            <input class="form-control" type="text" name="Phone" required /> <br />
+                            
                         </div>
                     </div>
 
@@ -70,7 +72,7 @@
 
                         <div class="form-group">
                             <div class="checkout-box">
-                                <input style="background-color: green; color: white;" class="btn btn-default" type="submit" value="Order" />
+                                <input style="background-color: green; color: white;" class="AddOrder btn btn-default" type="submit" value="Order" />
                             </div>
                         </div>
                     </div>
