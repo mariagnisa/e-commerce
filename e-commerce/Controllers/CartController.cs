@@ -115,7 +115,7 @@ namespace e_commerce.Controllers
                 jsonResponse.message = "The product has been added to your cart.";
             }
 
-            return Json(jsonResponse, JsonRequestBehavior.AllowGet);
+            return Json(jsonResponse);
         }
 
         [HttpPost]
@@ -130,6 +130,7 @@ namespace e_commerce.Controllers
                     var update = "update Cart set Quantity = @Quantity where CartId = @CartId and ProductId = @ProductId";
                     var updateParameter = new { Quantity = Quantity, CartId = CartId, ProductId = ProductId };
                     connection.Execute(update, updateParameter);
+
                 } catch (SqlException )
                 {
                     return View("Error");
@@ -138,7 +139,7 @@ namespace e_commerce.Controllers
             jsonResponse.succes = true;
             jsonResponse.message = "The quantity of the product is changed.";
 
-            return Json(jsonResponse, JsonRequestBehavior.AllowGet);
+            return Json(jsonResponse);
         }
 
         [HttpPost]
@@ -163,7 +164,7 @@ namespace e_commerce.Controllers
             jsonResponse.succes = true;
             jsonResponse.message = "The product is deleted.";
 
-            return Json(jsonResponse, JsonRequestBehavior.AllowGet);
+            return Json(jsonResponse);
         }
     }
 }
