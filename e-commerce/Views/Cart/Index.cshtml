@@ -3,12 +3,12 @@
     ViewBag.Title = "Cart";
 }
 @section scripts{ <script type="text/javascript" src="~/scripts/cameraObscura.js"></script> }
-<h1 class="text-center">Your cart</h1>
 <div class="text-center">
     <p style="padding: 10px;" class="messageBox"></p>
 </div>
-<div style="margin: 0 auto; width: 100%;" class="container-fluid">
-    
+<div style="margin: 0 auto; width: 100%;" class="container-fluid cart-container">
+    <h1 class="text-center">Your cart</h1>
+  
         @if (Model == null)
         {
             <h4 class="text-center">@ViewBag.Message</h4>
@@ -31,7 +31,7 @@
                         <div style="display: flex; flex-direction: row; padding-top: 10px;" class="form-group">
                             <input type="hidden" name="ProductId" value="@cart.ProductId" />
                             <input type="hidden" name="CartId" value="@cart.CartId" />
-                            <input style="width: 70px; margin-right: 10px;" class="form-control" type="number" name="Quantity" value="@cart.Quantity" /> <br />
+                            <input min="1" style="width: 70px; margin-right: 10px;" class="form-control" type="number" name="Quantity" value="@cart.Quantity" /> <br />
                             <input class="updateQuantity btn btn-default" type="submit" name="Add" value="Change quantity" />
                         </div>
                     }
@@ -47,7 +47,7 @@
                 }
              
             </div>
-
+               
                 <div style="padding-top: 30px; float: right;" class="col">
 
                     <h4>Total sum: @Model.Sum(p => p.ProductPrice * p.Quantity) £</h4>
